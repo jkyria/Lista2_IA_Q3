@@ -1,0 +1,29 @@
+# Bytecode / cache do Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Cache de ferramentas de teste/lint
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.cache/
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Artefatos de build/empacotamento
+*.egg-info/
+build/
+dist/
+
+# Arquivos de IDE / SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
