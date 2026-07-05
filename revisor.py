@@ -17,6 +17,9 @@ class Achado:
     mensagem: str
     trecho: str
     recomendacao: str
+    # True  -> `trecho` e uma citacao literal extraida do artigo;
+    # False -> `trecho` e uma constatacao da analise (ex.: "informacao nao localizada").
+    trecho_literal: bool = False
 
 
 class RevisorCientificoLocal:
@@ -210,7 +213,7 @@ class RevisorCientificoLocal:
         amostra_suspeita = self.primeiro_trecho(sentencas, [r"\b(amostra|n)\s*(=|de|foi\s+de|com)\s*(1|2|3|4|5)\b", r"\b(apenas|somente|so)\s+(1|2|3|4|5)\s+(participantes?|alunos?|estudantes?|pessoas?)\b"])
         if amostra_suspeita and not self.contem(amostra_suspeita, [r"\bqualitativ[ao]\b", r"\bexploratori[ao]\b", r"\bestudo\s+de\s+caso\b", r"\bpiloto\b"]):
             nota -= 20
-            achados.append(Achado("Metodologia", "grave", "A amostra parece pequena e não foi justificada no mesmo contexto.", amostra_suspeita, "Justificar a amostra ou ampliar o tamanho amostral (ou explicitar que é um estudo qualitativo/piloto)."))
+            achados.append(Achado("Metodologia", "grave", "A amostra parece pequena e não foi justificada no mesmo contexto.", amostra_suspeita, "Justificar a amostra ou ampliar o tamanho amostral (ou explicitar que é um estudo qualitativo/piloto).", trecho_literal=True))
 
         return self.dim("Rigor metodológico", 1.4, nota, achados)
 
@@ -254,10 +257,10 @@ class RevisorCientificoLocal:
             achados.append(Achado("Evidências", "alerta", "Não foram encontrados indicadores, tabela, figura ou medida objetiva.", "Sem métricas detectadas.", "Adicionar dados, categorias analíticas, frequências, exemplos ou medidas estatísticas."))
         if conclusao_forte:
             nota -= 25
-            achados.append(Achado("Evidências", "grave", "A conclusão usa linguagem absoluta acima do que as evidências sustentam.", conclusao_forte, "Trocar a certeza absoluta por conclusões proporcionais aos dados e mencionar os limites."))
+            achados.append(Achado("Evidências", "grave", "A conclusão usa linguagem absoluta acima do que as evidências sustentam.", conclusao_forte, "Trocar a certeza absoluta por conclusões proporcionais aos dados e mencionar os limites.", trecho_literal=True))
         if trecho_incoerente:
             nota -= 30
-            achados.append(Achado("Evidências", "grave", f"Um resultado citado ({valor_incoerente}) não aparece nos dados ou tabelas apresentados.", trecho_incoerente, "Garantir que todo número citado como resultado apareça de fato nos dados, tabelas ou figuras do artigo."))
+            achados.append(Achado("Evidências", "grave", f"Um resultado citado ({valor_incoerente}) não aparece nos dados ou tabelas apresentados.", trecho_incoerente, "Garantir que todo número citado como resultado apareça de fato nos dados, tabelas ou figuras do artigo.", trecho_literal=True))
 
         return self.dim("Evidências e resultados", 1.3, nota, achados)
 
@@ -278,7 +281,7 @@ class RevisorCientificoLocal:
             achados.append(Achado("Referencial teórico", "alerta", "O texto tem poucas citações para sustentar a revisão crítica.", f"{citacoes} citação(ões) detectada(s).", "Ampliar o diálogo com literatura científica recente e relevante."))
         if fonte_fraca:
             nota -= 25
-            achados.append(Achado("Referencial teórico", "grave", "Uma fonte fraca aparece como base principal.", fonte_fraca, "Substituir por artigos, livros, documentos técnicos ou bases científicas."))
+            achados.append(Achado("Referencial teórico", "grave", "Uma fonte fraca aparece como base principal.", fonte_fraca, "Substituir por artigos, livros, documentos técnicos ou bases científicas.", trecho_literal=True))
 
         return self.dim("Referencial teórico e citações", 1.2, nota, achados)
 
@@ -293,7 +296,7 @@ class RevisorCientificoLocal:
             achados.append(Achado("Argumentação", "alerta", "A argumentação tem poucos conectores lógicos.", f"{conectores} conector(es) detectado(s).", "Explicitar relações de causa, contraste, consequência e comparação entre as ideias."))
         if subjetivo:
             nota -= 25
-            achados.append(Achado("Argumentação", "grave", "Há linguagem opinativa usada como critério científico.", subjetivo, "Substituir opiniões por evidências, autores, dados ou justificativas metodológicas."))
+            achados.append(Achado("Argumentação", "grave", "Há linguagem opinativa usada como critério científico.", subjetivo, "Substituir opiniões por evidências, autores, dados ou justificativas metodológicas.", trecho_literal=True))
 
         return self.dim("Argumentação crítica", 1.0, nota, achados)
 
@@ -305,7 +308,7 @@ class RevisorCientificoLocal:
             trecho = self.primeiro_trecho(sentencas, padroes)
             if trecho:
                 nota -= 45
-                achados.append(Achado("Ética e integridade", "grave", f"{criterio} detectada.", trecho, "Revisar a integridade do estudo antes de qualquer aprovação."))
+                achados.append(Achado("Ética e integridade", "grave", f"{criterio} detectada.", trecho, "Revisar a integridade do estudo antes de qualquer aprovação.", trecho_literal=True))
 
         return self.dim("Ética e integridade científica", 1.5, nota, achados)
 

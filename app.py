@@ -8,6 +8,14 @@ except ImportError:
     PdfReader = None
 
 
+def resumir(texto, limite=200):
+    """Encurta trechos longos para exibicao, sem cortar no meio de uma palavra."""
+    texto = texto.strip()
+    if len(texto) <= limite:
+        return texto
+    return texto[:limite].rsplit(" ", 1)[0].rstrip(" ,.;:") + "…"
+
+
 def extrair_texto_pdf(arquivo):
     if PdfReader is None:
         st.error("A biblioteca pypdf não está instalada. Instale com: pip install pypdf")
@@ -88,12 +96,15 @@ def main():
                 if not resultado["achados"]:
                     st.success("Nenhuma fragilidade relevante foi detectada pela rubrica.")
                 else:
-                    st.caption("Cada fragilidade traz o trecho analisado e uma orientação de como melhorar.")
+                    st.caption("Cada fragilidade traz o que foi observado e uma orientação de como melhorar.")
                     for achado in resultado["achados"]:
                         with st.expander(f"{achado.dimensao} — {achado.nivel}"):
                             st.write(achado.mensagem)
                             if achado.trecho:
-                                st.caption(f"Trecho analisado: {achado.trecho}")
+                                if achado.trecho_literal:
+                                    st.caption(f"Trecho do artigo: “{resumir(achado.trecho)}”")
+                                else:
+                                    st.caption(f"O que foi observado: {achado.trecho}")
                             st.markdown(f"**Como melhorar:** {achado.recomendacao}")
 
             with aba2:
